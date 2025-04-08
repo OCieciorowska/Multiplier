@@ -101,4 +101,50 @@ public class Multiplier
                 Console.WriteLine();
             }
         }
+       //zadanie2 
+        public long MultiplyWithThreads()
+        {
+            var watch = Stopwatch.StartNew();
+            Thread[] threads = new Thread[_maxThreads];
+
+            int rowsPerThread = _size / _maxThreads;
+            int remainder = _size % _maxThreads;
+
+            int currentRow = 0;
+
+            for (int i = 0; i < _maxThreads; i++)
+            {
+                int start = currentRow;
+                int count = rowsPerThread + (i < remainder ? 1 : 0);
+                int end = start + count;
+
+                threads[i] = new Thread(() => MultiplyRange(start, end));
+                threads[i].Start();
+
+                currentRow = end;
+            }
+
+            foreach (var thread in threads)
+                thread.Join();
+
+            watch.Stop();
+            return watch.ElapsedMilliseconds;
+        }
+
+// Pomocnicza metoda – mnoży podany zakres wierszy
+        private void MultiplyRange(int startRow, int endRow)
+        {
+            for (int i = startRow; i < endRow; i++)
+            {
+                for (int j = 0; j < _size; j++)
+                {
+                    _resultMatrix[i, j] = 0;
+                    for (int k = 0; k < _size; k++)
+                    {
+                        _resultMatrix[i, j] += _matrixA[i, k] * _matrixB[k, j];
+                    }
+                }
+            }
+        }
+
 }
