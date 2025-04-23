@@ -41,7 +41,7 @@ public class Multiplier
         {
             var watch = Stopwatch.StartNew();//start pomiaru czasu
             
-            for (int i = 0; i < _size; i++)
+            for (int i = 0; i < _size; i++) 
             {
                 for (int j = 0; j < _size; j++)
                 {

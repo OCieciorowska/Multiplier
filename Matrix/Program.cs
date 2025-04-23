@@ -11,7 +11,7 @@ namespace Matrix;
 class Program
 {
     static void Main(string[] args)
-    {
+    {  
         Console.WriteLine("=== Matrix Multiplication Benchmark ===\n");
 
         // Parametry testów
