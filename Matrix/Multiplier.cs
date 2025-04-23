@@ -14,25 +14,25 @@ public class Multiplier
 //konstruktor inicjalizuje macierze i ustawia rozmiar i liczbe wątków
         public Multiplier(int size, int maxThreads)
         {
-            _size = size;
-            _maxThreads = maxThreads;
-            _matrixA = new int[size, size];
-            _matrixB = new int[size, size];
-            _resultMatrix = new int[size, size];
+            _size = size; // Ustaw rozmiar macierzy
+            _maxThreads = maxThreads;  // Ustaw maksymalną liczbę wątków
+            _matrixA = new int[size, size]; // Inicjalizuj macierz A
+            _matrixB = new int[size, size]; // Inicjalizuj macierz B
+            _resultMatrix = new int[size, size]; // Inicjalizuj macierz wynikową
             
             InitializeMatrices();//losowe liczby w macierzach a i b
         }
 // Wypełnia macierze A i B losowymi liczbami z przedziału [1, 9]
         private void InitializeMatrices()
         {
-            var random = new Random();
+            var random = new Random(); // Generator liczb losowych
             
-            for (int i = 0; i < _size; i++)
+            for (int i = 0; i < _size; i++) // Iteruj po wierszach
             {
-                for (int j = 0; j < _size; j++)
+                for (int j = 0; j < _size; j++) // Iteruj po kolumnach
                 {
-                    _matrixA[i, j] = random.Next(1, 10);
-                    _matrixB[i, j] = random.Next(1, 10);
+                    _matrixA[i, j] = random.Next(1, 10); // Losowa liczba dla A
+                    _matrixB[i, j] = random.Next(1, 10); // Losowa liczba dla B
                 }
             }
         }
@@ -45,8 +45,8 @@ public class Multiplier
             {
                 for (int j = 0; j < _size; j++)
                 {
-                    _resultMatrix[i, j] = 0;
-                    for (int k = 0; k < _size; k++)
+                    _resultMatrix[i, j] = 0; // Wyzeruj komórkę wyniku
+                    for (int k = 0; k < _size; k++) // Przemnóż odpowiednie elementy
                     {
                         _resultMatrix[i, j] += _matrixA[i, k] * _matrixB[k, j];
                     }
@@ -54,9 +54,10 @@ public class Multiplier
             }
             
             watch.Stop();//koniec pomiaru czasu
-            return watch.ElapsedMilliseconds;
+            //return watch.ElapsedMilliseconds;
+            return (long)watch.Elapsed.TotalMicroseconds;
         }
-//równoległe mnożenie macierzy z wykorzystaniem wilu wątków
+//równoległe mnożenie macierzy 
         public long MultiplyParallel()
         {
             var watch = Stopwatch.StartNew();//pomiar czasu
@@ -75,7 +76,8 @@ public class Multiplier
             });
 
             watch.Stop();//koniec pomiaru czasu
-            return watch.ElapsedMilliseconds;
+            //return watch.ElapsedMilliseconds;
+            return (long)watch.Elapsed.TotalMicroseconds;
         }
 //wyświetlanie macierzy w konsoli
         public void PrintMatrices()
@@ -101,42 +103,45 @@ public class Multiplier
                 Console.WriteLine();
             }
         }
-       //zadanie2 
+       //zadanie2
+       // Mnożenie macierzy z wykorzystaniem Thread (niskopoziomowe)
         public long MultiplyWithThreads()
         {
             var watch = Stopwatch.StartNew();
-            Thread[] threads = new Thread[_maxThreads];
+            Thread[] threads = new Thread[_maxThreads]; // Tablica wątków
 
-            int rowsPerThread = _size / _maxThreads;
-            int remainder = _size % _maxThreads;
+            int rowsPerThread = _size / _maxThreads;  // Liczba wierszy na wątek
+            int remainder = _size % _maxThreads; // Reszta (jeśli rozmiar się nie dzieli idealnie)
 
-            int currentRow = 0;
+            int currentRow = 0; //aktualny wiersz startowy
 
-            for (int i = 0; i < _maxThreads; i++)
+            for (int i = 0; i < _maxThreads; i++) // Tworzenie i uruchamianie wątków
+            
             {
-                int start = currentRow;
-                int count = rowsPerThread + (i < remainder ? 1 : 0);
-                int end = start + count;
+                int start = currentRow;//startowy wiersz
+                int count = rowsPerThread + (i < remainder ? 1 : 0);//liczba wierszy w tym wątku
+                int end = start + count;//wiersz końcowy (nie włącznie)
 
-                threads[i] = new Thread(() => MultiplyRange(start, end));
-                threads[i].Start();
+                threads[i] = new Thread(() => MultiplyRange(start, end));//nowy wątek
+                threads[i].Start(); //start wątku
 
-                currentRow = end;
+                currentRow = end; //przesuń na kolejny start
             }
 
-            foreach (var thread in threads)
+            foreach (var thread in threads)//czekaj aż wszystkie wątki zakończą
                 thread.Join();
 
-            watch.Stop();
-            return watch.ElapsedMilliseconds;
+            watch.Stop(); //koniec pomiaru 
+            //return watch.ElapsedMilliseconds; //Zwróć czas
+            return (long)watch.Elapsed.TotalMicroseconds;
         }
 
 // Pomocnicza metoda – mnoży podany zakres wierszy
-        private void MultiplyRange(int startRow, int endRow)
+        private void MultiplyRange(int startRow, int endRow) //od startRow do endRow
         {
-            for (int i = startRow; i < endRow; i++)
+            for (int i = startRow; i < endRow; i++) //Wiersze do przetworzenia 
             {
-                for (int j = 0; j < _size; j++)
+                for (int j = 0; j < _size; j++)//kolumny
                 {
                     _resultMatrix[i, j] = 0;
                     for (int k = 0; k < _size; k++)
@@ -146,5 +151,4 @@ public class Multiplier
                 }
             }
         }
-
 }
